@@ -1,0 +1,16 @@
+# CODEOWNERS — defines who reviews changes to which paths
+# Docs: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Global owner — all files require review from org owner
+* @NerdChild137
+
+# Framework docs — any change to the governance templates requires owner review
+docs/ @NerdChild137
+DIRECTIVE/ @NerdChild137
+EXAMPLES/ @NerdChild137
+
+# OSS health files
+README.md @NerdChild137
+CONTRIBUTING.md @NerdChild137
+SECURITY.md @NerdChild137
+LICENSE @NerdChild137

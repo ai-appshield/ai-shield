@@ -1,0 +1,66 @@
+# CI workflow — runs on every push and pull request to main
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  lint-docs:
+    name: Lint Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check required AppShield docs exist
+        run: |
+          echo "Checking for required AppShield governance docs..."
+          REQUIRED=(
+            "docs/conventions.md"
+            "docs/locked-patterns.md"
+            "docs/knowledge-base.md"
+            "docs/session-handoff.md"
+            "docs/update-process.md"
+            "docs/decision-log.md"
+            "docs/agent-workflow.md"
+          )
+          MISSING=0
+          for f in "${REQUIRED[@]}"; do
+            if [ ! -f "$f" ]; then
+              echo "MISSING: $f"
+              MISSING=$((MISSING+1))
+            else
+              echo "OK: $f"
+            fi
+          done
+          if [ $MISSING -gt 0 ]; then
+            echo "::error::$MISSING required AppShield doc(s) missing. See output above."
+            exit 1
+          fi
+          echo "All required docs present."
+
+      - name: Check for temp files (commit violation test)
+        run: |
+          echo "Scanning for forbidden temp files..."
+          if find . -name '*.tmp' -not -path './.git/*' | grep -q .; then
+            echo "::warning::Temporary .tmp files found in repository. Remove before merging."
+            find . -name '*.tmp' -not -path './.git/*'
+          else
+            echo "No .tmp files found."
+          fi
+
+      - name: Validate README not truncated
+        run: |
+          WORDCOUNT=$(wc -w < README.md)
+          echo "README.md word count: $WORDCOUNT"
+          if [ "$WORDCOUNT" -lt 200 ]; then
+            echo "::error::README.md appears truncated ($WORDCOUNT words). Minimum 200 words required."
+            exit 1
+          fi
+          echo "README.md OK."

@@ -1,0 +1,13 @@
+# FAKE TEMP FILE — intentionally committed to test the commit violation detection feature
+# This file should be flagged by the CI workflow's temp file check.
+# Safe to delete once the violation detection feature is verified.
+#
+# Expected behavior:
+#   - CI: warning on the 'Check for temp files' step
+#   - AppShield commit monitor: flags this commit as containing a forbidden file pattern
+#   - Dashboard: shows this as a violation in the commit history view
+#
+# Created: 2026-06-25
+# Created by: TraghmTech test suite
+TEMP_TEST_DATA=true
+CREATED_FOR=commit_violation_test
