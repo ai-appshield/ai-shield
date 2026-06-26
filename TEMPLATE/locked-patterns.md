@@ -1,80 +1,44 @@
 # Locked Patterns
 
 > **AI AppShield — locked-patterns.md**
-> This document lists everything that must NOT be changed without explicit human approval.
-> Before proposing any change, the agent must check this document.
-> If a proposed change touches anything listed here, STOP and ask for approval. Do not proceed.
+> Do NOT modify anything listed here without explicit human approval.
+
+---
+
+## Locked Architecture
+
+- **Auth system:** Clerk — do not replace or modify auth flow
+- **Database:** Supabase — do not switch providers
+- **GitHub API:** Octokit REST v21 — do not swap to GraphQL without approval
+- **Hosting:** Vercel — do not introduce Docker or server config
 
 ---
 
 ## Locked Files — Do Not Modify
 
-| File / Path | Reason Locked | Approval Required From |
-|-------------|--------------|------------------------|
-| [PLACEHOLDER] | [WHY] | [WHO] |
-| [PLACEHOLDER] | [WHY] | [WHO] |
+| File | Reason |
+|------|--------|
+| `middleware.ts` | Auth protection — changes affect all routes |
+| `supabase/migrations/*.sql` | Production schema — never alter existing migrations |
+| `.env.example` | Public reference — never add real secrets |
 
 ---
 
-## Locked Architecture — Do Not Redesign
-
-The following architectural decisions are final. Do not suggest replacing, refactoring, or significantly changing these components without explicit approval:
-
-- **Authentication system:** [PLACEHOLDER — e.g., "Clerk — do not replace or modify auth flow"]
-- **Payment provider:** [PLACEHOLDER — e.g., "Stripe — do not swap or restructure payment logic"]
-- **Database ORM:** [PLACEHOLDER — e.g., "Prisma — do not switch to raw SQL or another ORM"]
-- **CI/CD pipeline:** [PLACEHOLDER — e.g., "GitHub Actions — do not modify workflow files"]
-- **Hosting infrastructure:** [PLACEHOLDER — e.g., "Replit — do not introduce Docker or external server config"]
-- [PLACEHOLDER — add others as needed]
-
----
-
-## Locked Dependencies — Frozen Versions
-
-The following packages are pinned to specific versions. Do NOT suggest upgrading them. Each pin exists for a documented reason.
+## Locked Dependencies
 
 | Package | Pinned Version | Reason |
 |---------|---------------|--------|
-| [PLACEHOLDER] | [VERSION] | [WHY — e.g., "v4 breaks our ORM integration"] |
-| [PLACEHOLDER] | [VERSION] | [WHY] |
-
-**Agent rule:** Never suggest a dependency upgrade as part of a task unless the task explicitly requires it and the human has approved it.
+| `next` | 15.3.0 | Stable App Router — do not upgrade mid-sprint |
+| `@clerk/nextjs` | ^6.0.0 | Auth API stable — do not upgrade without testing |
 
 ---
 
-## Locked API Permissions & Middleware
+## Scope Boundaries
 
-The permission and authorization middleware is production-critical. Changes here affect every protected route.
-
-- **Middleware file:** [PLACEHOLDER — file path]
-- **Permission model:** [PLACEHOLDER — describe your RBAC/ACL model briefly]
-- **Rule:** Any change to permissions, roles, or middleware requires human review and approval BEFORE execution. No exceptions.
+- Do NOT add payments or billing (Phase 2)
+- Do NOT add team/multi-user features (Phase 2)
+- Do NOT modify Supabase RLS policies without human review
 
 ---
 
-## Locked Database Schema
-
-The following tables/collections are in production with live data. Schema changes require a migration plan:
-
-| Table / Collection | Notes |
-|-------------------|-------|
-| [PLACEHOLDER] | [e.g., "Has 50k+ rows — migrations must be backward compatible"] |
-
-**Agent rule:** Never modify a locked schema table without a migration plan approved by the human first.
-
----
-
-## Scope Boundaries — Out of Scope for AI
-
-The following are permanently out of scope for AI agent action, regardless of context:
-
-- [ ] Replacing the authentication provider
-- [ ] Changing the payment gateway
-- [ ] Modifying environment variable names in production
-- [ ] Changing the database provider
-- [ ] Modifying CI/CD workflow files
-- [ ] [PLACEHOLDER — add project-specific scope limits]
-
----
-
-*Last updated: [DATE] by [WHO]*
+*Last updated: 2026-06-10 — Sprint 1 scaffold*

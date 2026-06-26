@@ -1,72 +1,72 @@
 # Agent Workflow
 
-> **AI AppShield — agent-workflow.md**
-> Defines which AI model, mode, or tool to use for which type of task.
-> Prevents using fast/cheap models for decisions that need careful reasoning.
-> Agent: Follow this guide when deciding how to approach a task.
+This document defines how AI agents (Copilot, Claude, Cursor, Perplexity, etc.) should interact with this codebase. Following these guidelines ensures consistent, safe, and productive AI-assisted development.
 
 ---
 
-## Model Selection by Task Type
+## Core Principles
 
-| Task Type | Recommended Model/Mode | Why |
-|-----------|----------------------|-----|
-| Architecture decisions | [PLACEHOLDER — e.g., "Claude Sonnet with extended thinking"] | Requires careful reasoning over tradeoffs |
-| New feature planning | [PLACEHOLDER — e.g., "Claude Sonnet standard"] | Needs context + creativity |
-| Bug investigation | [PLACEHOLDER — e.g., "Claude Sonnet standard"] | Needs systematic reasoning |
-| Code generation (routine) | [PLACEHOLDER — e.g., "Claude Haiku or Cursor Tab"] | Speed over depth |
-| Documentation updates | [PLACEHOLDER — e.g., "Any model"] | Low complexity |
-| Security review | [PLACEHOLDER — e.g., "Claude Sonnet with extended thinking"] | High stakes, needs depth |
-| Refactoring | [PLACEHOLDER — e.g., "Claude Sonnet standard"] | Needs full context |
-| Code review / PR summary | [PLACEHOLDER — e.g., "Any capable model"] | Analytical but not deep |
+1. **Read before writing** — Always read the relevant file before proposing changes
+2. **Minimal footprint** — Change only what is necessary for the task at hand
+3. **Cite decisions** — Reference `docs/decision-log.md` when proposing architectural changes
+4. **Respect locked patterns** — Never override items in `docs/locked-patterns.md`
+5. **Human approval** — No merge without explicit human confirmation
 
 ---
 
-## Session Size Rules
+## Session Start Protocol
 
-- **Small tasks** (1 file, under 50 lines changed): Single session, no plan required
-- **Medium tasks** (2–5 files, under 200 lines): Propose steps, get approval, execute
-- **Large tasks** (6+ files or architectural): Mandatory phased plan, approved before ANY execution
-
-**Agent rule:** If a task grows beyond its original scope during execution, STOP. Report the scope change to the human and get approval before continuing.
-
----
-
-## Context Window Management
-
-- Load only the `/docs` files relevant to the current task
-- For large documents, read the Table of Contents or routing index first, then load only the relevant section
-- When context gets long, use `/compact` (Claude Code) or equivalent before loading new files
-- Never attempt to load the entire codebase — load by feature area
+At the start of every development session, an agent should:
+1. Read `docs/session-handoff.md` — understand where the last session ended
+2. Read `docs/decision-log.md` — understand major decisions already made
+3. Read `docs/locked-patterns.md` — know what must not change
+4. Confirm the current task with the human before writing any code
 
 ---
 
-## Multi-Session Projects
+## File Ownership
 
-1. **Session start:** Read `session-handoff.md` first. Confirm status before any task.
-2. **During session:** Follow `conventions.md` and check `locked-patterns.md` before changes.
-3. **Session end:** Update `session-handoff.md` with completed work, in-progress items, and next steps.
-4. **Blockers:** If blocked waiting for human input, document the blocker in `session-handoff.md` before ending.
-
----
-
-## Tool-Specific Notes
-
-### Replit Agent
-- [PLACEHOLDER — any Replit-specific workflow notes]
-
-### Claude Code
-- Use `/compact` before loading large files
-- Use extended thinking for architecture decisions (`claude --think`)
-- [PLACEHOLDER — any Claude Code-specific notes]
-
-### Cursor
-- Use Composer for multi-file changes, get plan approved first
-- [PLACEHOLDER — any Cursor-specific notes]
-
-### GitHub Copilot
-- [PLACEHOLDER — any Copilot-specific notes]
+| Area | Files | Notes |
+|------|-------|-------|
+| Scanner logic | `lib/scanner.ts` | Core scoring — changes require justification |
+| Auth | `middleware.ts`, Clerk config | Never modify without security review |
+| Database | `lib/supabase.ts`, `supabase/` | Schema changes need migration file |
+| UI Components | `components/` | Free to iterate with human approval |
+| API Routes | `app/api/` | All routes must validate auth via Clerk |
 
 ---
 
-*Last updated: [DATE] by [WHO]*
+## Prohibited Actions
+
+- Do not delete or overwrite `docs/` files without explicit instruction
+- Do not add new environment variables without updating `.env.example`
+- Do not change the scoring algorithm without updating `docs/decision-log.md`
+- Do not introduce new npm dependencies without noting them in the PR description
+- Do not push directly to `main` — always via PR (except emergency hotfixes)
+
+---
+
+## Recommended Workflow for New Features
+
+```
+1. Read docs/session-handoff.md + docs/decision-log.md
+2. Confirm feature scope with human
+3. Identify affected files (read them first)
+4. Write code changes
+5. Check against docs/locked-patterns.md
+6. Present diff to human for approval
+7. Push on approval
+8. Update docs/session-handoff.md
+```
+
+---
+
+## Session End Protocol
+
+At the end of every productive session:
+1. Update `docs/session-handoff.md` with what was completed
+2. Log any significant decisions in `docs/decision-log.md`
+3. Note the next agenda item clearly
+
+## Last Updated
+2026-06-23

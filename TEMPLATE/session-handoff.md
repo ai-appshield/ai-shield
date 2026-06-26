@@ -1,63 +1,49 @@
 # Session Handoff
 
 > **AI AppShield — session-handoff.md**
-> Written at the END of every session. Read at the START of every session.
-> This document is the bridge between sessions. Keep it current or lose the benefit.
-> Agent: Update this document at the end of every session (Type 2 action — automatic, no approval needed).
+> Update at END of every session. Read at START of every session.
 
 ---
 
-## Current Project Status
+## Current Status
 
-**One sentence:** [PLACEHOLDER — e.g., "Authentication is complete and deployed; working on dashboard data layer."]
+**One sentence:** Sprint 1 scaffold complete — Next.js 15, Tailwind, Clerk, Supabase, and core lib files are all pushed to GitHub.
 
-**Overall health:** [ ] 🟢 Stable  [ ] 🟡 In progress  [ ] 🔴 Blocked
-
----
-
-## Just Completed (This Session)
-
-- [PLACEHOLDER — bullet list of what was finished this session]
-- [PLACEHOLDER]
+**Overall health:** 🟡 In progress
 
 ---
 
-## In Progress (Partially Done)
+## Just Completed
 
-| Task | Status | File(s) Affected | Notes |
-|------|--------|-----------------|-------|
-| [PLACEHOLDER] | [%] | [FILES] | [NOTES] |
-
----
-
-## Up Next (Next Session)
-
-1. [PLACEHOLDER — first priority for next session]
-2. [PLACEHOLDER]
-3. [PLACEHOLDER]
+- Created repo at github.com/ai-appshield/appshield-dashboard
+- Pushed full Sprint 1 scaffold: Next.js 15 + Tailwind v4 + Clerk + Supabase
+- Built core scanner engine in lib/scanner.ts
+- Built GitHub fetcher in lib/github.ts
+- Built Supabase data layer in lib/supabase.ts
+- Built ConnectRepo component with scan form
+- Built /api/scan route
+- Added Supabase migration SQL
+- Added AppShield docs for this project
 
 ---
 
-## Open Questions / Blockers
+## Up Next (Sprint 2 — In Replit)
 
-- [PLACEHOLDER — anything waiting on human decision or external dependency]
-
----
-
-## Recent Decisions Made
-
-> Quick log of decisions made this session that future sessions should know about.
-
-- [PLACEHOLDER — e.g., "Decided to use optimistic UI updates for the like button — see decision-log.md #3"]
+1. Import repo into Replit
+2. Add environment variables (Clerk, Supabase, GitHub PAT)
+3. Run `npm install` and confirm app starts
+4. Run Supabase migration (001_init.sql)
+5. Test scan on NerdChild137/sportshub
+6. Test scan on ai-appshield/ai-shield
+7. Fix any issues from live scan test
 
 ---
 
-## Warnings for Next Session
+## Open Questions
 
-> Anything the next session should be careful about or avoid.
-
-- [PLACEHOLDER — e.g., "Do not touch the auth middleware — it is in a delicate state pending security review"]
+- Does Replit need any special Next.js config for port binding?
+- GitHub PAT: create one with `repo:read` scope for dev testing
 
 ---
 
-*Last updated: [DATE] — End of session [SESSION NUMBER or DESCRIPTION]*
+*Last updated: 2026-06-10 — Sprint 1 complete, ready for Replit import*

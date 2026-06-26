@@ -1,71 +1,46 @@
 # Update Process
 
-> **AI AppShield — update-process.md**
-> Defines how and when `/docs` documents are updated.
-> Agent: Follow this document after every completed task.
+## Overview
+This document defines how changes are reviewed, approved, and merged into this project. All contributors and AI agents must follow this process.
 
----
+## Change Categories
 
-## The Two-Action Rule (Quick Reference)
+| Category | Examples | Review Required |
+|----------|----------|----------------|
+| **Critical** | Auth, payments, data deletion | 2 reviewers + security check |
+| **Feature** | New UI, new API endpoint | 1 reviewer |
+| **Docs** | README, inline comments | Self-merge allowed |
+| **Hotfix** | Production bug | 1 reviewer, expedited |
 
-| Type | Action | Approval | Timing |
-|------|--------|----------|--------|
-| **Type 1** | Any codebase change (code, config, permissions, schema, infrastructure) | Human approves **BEFORE** execution | Propose → Wait → Execute |
-| **Type 2** | Any `/docs` update reflecting an approved change | **Automatic** — no approval needed | Execute immediately after task completion |
+## Standard PR Process
 
-**The rule in plain English:** Reality (code) is always a human decision first. Documentation always follows reality automatically.
+1. **Branch** — Create a feature branch from `main`: `feat/`, `fix/`, `docs/`, `chore/`
+2. **Develop** — Write code, run tests locally
+3. **PR** — Open pull request with a clear title and description linking to the issue
+4. **Review** — At least one approval required before merge
+5. **CI** — All checks must pass (lint, type-check, build)
+6. **Merge** — Squash and merge preferred; delete branch after merge
 
----
+## AI Agent Guidelines
 
-## Change-to-Document Mapping
+- AI agents may draft code but must not merge without human approval
+- All AI-generated changes must be reviewed for security implications
+- Agents should reference this file before proposing architectural changes
 
-After every completed task, update the appropriate documents:
+## Versioning
 
-| Change Type | Update These Documents |
-|-------------|----------------------|
-| New feature added | `session-handoff.md`, `conventions.md` (if new pattern introduced) |
-| Bug fixed | `knowledge-base.md` (bug + fix), `session-handoff.md` |
-| Architecture decision made | `decision-log.md`, `session-handoff.md` |
-| Dependency added or changed | `conventions.md` (tech stack), `locked-patterns.md` (if pinned) |
-| File or folder structure changed | `conventions.md` (file structure section) |
-| New workaround discovered | `knowledge-base.md` (workarounds section) |
-| Locked pattern added | `locked-patterns.md` |
-| Session ended | `session-handoff.md` (always) |
+This project follows [Semantic Versioning](https://semver.org/):
+- **MAJOR** — Breaking API changes
+- **MINOR** — New backward-compatible features
+- **PATCH** — Backward-compatible bug fixes
 
----
+## Hotfix Process
 
-## Conflict Resolution Protocol
+For critical production issues:
+1. Branch directly from `main` with prefix `hotfix/`
+2. Fix, test, and open PR immediately
+3. Tag one reviewer for expedited review
+4. Deploy and monitor for 30 minutes post-merge
 
-If a requested change conflicts with any document in `/docs`:
-
-1. **Stop.** Do not proceed with the change.
-2. **Explain** the conflict clearly: which document, which rule, why there is a conflict.
-3. **Propose options** if applicable: how the task could be achieved within the rules, or what would need to change.
-4. **Wait** for human approval before taking any action.
-
-**Silence = do not proceed.** If you are unsure whether something conflicts, ask. Never assume permission.
-
----
-
-## Document Health Rules
-
-- `session-handoff.md` must be updated at the end of EVERY session, no exceptions
-- `knowledge-base.md` must be updated after EVERY bug fix
-- Stale entries (older than 90 days with no relevance) may be archived to `docs/archive/` after human approval
-- No document should be deleted — archive instead
-
----
-
-## Large Document Escalation
-
-If any document exceeds the following thresholds, flag it to the human:
-
-| Threshold | Action |
-|-----------|--------|
-| 400 lines | Add Table of Contents |
-| 600 lines | Propose splitting into sub-documents |
-| 1000 lines | Mandatory split — do not add more content until restructured |
-
----
-
-*Last updated: [DATE] by [WHO]*
+## Last Updated
+2026-06-23

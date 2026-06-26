@@ -1,9 +1,8 @@
 # Project Conventions
 
 > **AI AppShield — conventions.md**
-> This document defines the coding rules and patterns for this project.
-> The AI agent must read this document at session start and follow every rule here without exception.
-> If a task would require violating a rule, the agent must explain the conflict and wait for human approval.
+> This document defines the coding rules for the AppShield Dashboard project.
+> Read this before any task. Follow every rule without exception.
 
 ---
 
@@ -11,25 +10,36 @@
 
 | Layer | Technology | Version |
 |-------|-----------|--------|
-| Frontend | [PLACEHOLDER] | [VERSION] |
-| Backend | [PLACEHOLDER] | [VERSION] |
-| Database | [PLACEHOLDER] | [VERSION] |
-| Auth | [PLACEHOLDER] | [VERSION] |
-| Hosting | [PLACEHOLDER] | — |
-| CI/CD | [PLACEHOLDER] | — |
+| Frontend | Next.js | 15.3.0 |
+| Styling | Tailwind | v4 |
+| Auth | Clerk | v6 |
+| Database | Supabase (Postgres) | v2 |
+| GitHub API | Octokit REST | v21 |
+| Language | TypeScript | v5 |
+| Hosting | Vercel | — |
 
 ---
 
 ## File & Folder Structure
 
 ```
-[PLACEHOLDER — paste your project's folder structure here]
+appshield-dashboard/
+├── app/                  ← Next.js App Router pages + API routes
+│   ├── dashboard/        ← Protected dashboard pages
+│   ├── api/scan/         ← Scan API endpoint
+│   ├── sign-in/          ← Clerk sign-in
+│   └── sign-up/          ← Clerk sign-up
+├── components/           ← Reusable React components
+├── lib/                  ← Core logic: github.ts, scanner.ts, supabase.ts
+├── supabase/migrations/  ← SQL migration files
+└── docs/                 ← AppShield docs for this project
 ```
 
 **Rules:**
-- New files go in [PLACEHOLDER — define where new files belong]
-- Never create files outside the defined structure without approval
-- File naming convention: [PLACEHOLDER — e.g., kebab-case, PascalCase]
+- New components go in `/components`
+- New API routes go in `/app/api/`
+- Core logic goes in `/lib/` — keep components thin
+- Never put business logic in components
 
 ---
 
@@ -37,85 +47,44 @@
 
 | Item | Convention | Example |
 |------|-----------|--------|
-| Components | [PLACEHOLDER] | [EXAMPLE] |
-| Functions | [PLACEHOLDER] | [EXAMPLE] |
-| Variables | [PLACEHOLDER] | [EXAMPLE] |
-| Database tables | [PLACEHOLDER] | [EXAMPLE] |
-| API endpoints | [PLACEHOLDER] | [EXAMPLE] |
-| CSS classes | [PLACEHOLDER] | [EXAMPLE] |
+| Components | PascalCase | `HealthScore.tsx` |
+| Functions | camelCase | `scanRepository()` |
+| Variables | camelCase | `overallScore` |
+| API routes | kebab-case | `/api/scan` |
+| CSS classes | Tailwind utilities | `flex gap-3 mb-8` |
+| DB columns | snake_case | `health_score` |
 
 ---
 
 ## Patterns — Always Use
 
-- [PLACEHOLDER — e.g., "Always use async/await, never .then() chains"]
-- [PLACEHOLDER — e.g., "All API responses use the standard envelope: { data, error, meta }"]
-- [PLACEHOLDER — e.g., "All database queries go through the repository layer, never direct ORM calls in controllers"]
-- [PLACEHOLDER — add as many as needed]
+- Always use TypeScript strict mode
+- All API routes validate auth with Clerk before any logic
+- All DB operations go through `/lib/supabase.ts` — never raw Supabase calls in components
+- All GitHub API calls go through `/lib/github.ts`
+- All scanner logic lives in `/lib/scanner.ts`
+- Use async/await — never .then() chains
+- Error responses always use `NextResponse.json({ error: string }, { status: N })`
 
 ---
 
 ## Patterns — Never Use
 
-- [PLACEHOLDER — e.g., "Never use inline styles — all styles go in the CSS module"]
-- [PLACEHOLDER — e.g., "Never commit console.log statements"]
-- [PLACEHOLDER — e.g., "Never use var — only const and let"]
-- [PLACEHOLDER — add as many as needed]
-
----
-
-## Error Handling
-
-[PLACEHOLDER — describe your error handling standard]
-- Where errors are caught
-- How errors are logged
-- What the user sees vs. what goes to logs
-- Which errors are recoverable vs. fatal
-
----
-
-## API Conventions
-
-[PLACEHOLDER — describe your API design standards]
-- Base URL pattern
-- Authentication header format
-- Standard response envelope
-- Error response format
-- Versioning strategy
-
----
-
-## Testing Standards
-
-[PLACEHOLDER — describe your testing approach]
-- What must be tested
-- Test file location and naming
-- Minimum coverage requirements
-- How to run tests
-
-**Agent rule:** After any code change, propose what tests should be run or written before marking the task complete.
-
----
-
-## Environment & Configuration
-
-- Environment variables go in: [PLACEHOLDER]
-- Never hardcode credentials, API keys, or environment-specific values
-- Config file location: [PLACEHOLDER]
-- How to add a new environment variable: [PLACEHOLDER]
+- Never put Supabase client calls directly in components or pages
+- Never hardcode API keys or tokens
+- Never use `var` — only `const` and `let`
+- Never skip TypeScript types on function signatures
+- Never use inline styles for layout — use Tailwind; use CSS variables for colors only
 
 ---
 
 ## Task Segmentation Rule
 
-For any task touching more than 2 files or involving architectural change:
-1. Propose a phased plan listing each step
-2. Wait for human approval of the plan
+For any task touching more than 2 files:
+1. Propose a phased plan
+2. Wait for human approval
 3. Execute one phase at a time
-4. Confirm completion of each phase before proceeding
-
-Never execute a large multi-file change in a single shot without an approved plan.
 
 ---
 
-*Last updated: [DATE] by [WHO]*
+*Last updated: 2026-06-10 — Sprint 1 scaffold*
