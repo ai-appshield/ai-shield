@@ -6,6 +6,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-1.5-blue.svg)]()
 [![TraghmTech](https://img.shields.io/badge/by-TraghmTech-teal.svg)]()
+[![Language: Markdown](https://img.shields.io/badge/language-Markdown-blue.svg)]()
+
+**Primary language:** Markdown (framework-agnostic — works with any language or stack: JavaScript, Python, Go, Swift, Ruby, Rust, etc.)
 
 ---
 
@@ -17,8 +20,9 @@ Without a framework like this, AI agents:
 - Rewrite settled architecture on a whim
 - Repeat the same bugs across sessions
 - Contradict decisions made in previous sessions
-- Make "improvements" that break unrelated features
+- Make “improvements” that break unrelated features
 - Upgrade locked dependencies without asking
+- Never touch locked patterns without explicit human approval
 
 With AI AppShield, agents confirm they have read the rules before every session. They propose changes before executing them. They update documentation automatically after every task. And they never touch locked patterns without explicit human approval.
 
@@ -61,7 +65,7 @@ Every AI agent action falls into exactly one of two types:
 
 ### Step 1 — Copy the Templates
 
-Copy everything in the `/TEMPLATE` folder into a `/docs` folder at the root of your project:
+Copy the starter templates from the `/docs` folder (this repo) into a `/docs` folder at the root of **your project**:
 
 ```
 your-project/
@@ -81,11 +85,11 @@ Each template has `[PLACEHOLDER]` sections. Fill them in for your specific proje
 - `conventions.md` — your stack, naming rules, coding patterns
 - `locked-patterns.md` — architecture that must never change
 - `knowledge-base.md` — start with any known bugs or workarounds
-- `session-handoff.md` — current status and what's next
+- `session-handoff.md` — current status and what’s next
 
 ### Step 3 — Add the Directive to Your Agent
 
-Copy the appropriate snippet from the `/DIRECTIVE` folder into your AI tool's context file:
+Copy the appropriate snippet from the `/DIRECTIVE` folder into your AI tool’s context file:
 
 | AI Tool | Context File | Snippet |
 |---------|-------------|----------|
@@ -95,6 +99,48 @@ Copy the appropriate snippet from the `/DIRECTIVE` folder into your AI tool's co
 | GitHub Copilot | `.github/copilot-instructions.md` | `DIRECTIVE/copilot-instructions-snippet.md` |
 | Windsurf | `.windsurfrules` | Use `DIRECTIVE/cursorrules-snippet.md` as base |
 | OpenAI Codex | `AGENTS.md` | Use `DIRECTIVE/CLAUDE-snippet.md` as base |
+
+#### Example: CLAUDE.md snippet
+
+```markdown
+## AI AppShield Protocol
+
+Before every task:
+1. Read all files in /docs in this order:
+   - conventions.md
+   - locked-patterns.md
+   - session-handoff.md
+   - knowledge-base.md
+2. Confirm with: "AI AppShield loaded. I have read all required documents."
+3. Do NOT proceed until you have read all four files.
+
+During every task:
+- Type 1 (codebase changes): propose and WAIT for human approval.
+- Type 2 (doc updates): execute automatically after task completion.
+- If any proposed change conflicts with locked-patterns.md: STOP. Explain. Wait.
+
+After every task:
+- Update docs/session-handoff.md with current status, completed work, and next steps.
+- If a bug was fixed, log it in docs/knowledge-base.md.
+```
+
+#### Example: .cursorrules snippet
+
+```
+# AI AppShield Rules
+
+On session start:
+- Read /docs/conventions.md, /docs/locked-patterns.md, /docs/session-handoff.md, /docs/knowledge-base.md
+- Confirm: "AppShield loaded."
+
+On every code change:
+- Propose Type 1 changes (code/config/infra) BEFORE executing. Wait for approval.
+- Execute Type 2 changes (doc updates) automatically after task completion.
+- Locked patterns in /docs/locked-patterns.md must NEVER be changed without explicit human instruction.
+
+On session end:
+- Update /docs/session-handoff.md with current state and next steps.
+```
 
 ### Step 4 — Start Your Session
 
@@ -106,7 +152,7 @@ Current status: [one sentence from session-handoff.md]. Ready for task.
 ```
 
 If the agent does not send this confirmation, prompt it:
-> "Read the AppShield docs and confirm before we start."
+> “Read the AppShield docs and confirm before we start.”
 
 ### Step 5 — Keep It Alive
 
@@ -119,14 +165,73 @@ After every session, verify the agent updated `session-handoff.md`. After every 
 ### `docs/conventions.md`
 The coding constitution for your project. Defines your tech stack, naming conventions, file structure rules, patterns to always use, and patterns to never use. The agent treats this as law. Everything it writes must conform to what is written here.
 
+**Example entry:**
+```markdown
+## Stack
+- Language: TypeScript (strict mode)
+- Framework: Next.js 14 App Router
+- Database: PostgreSQL via Prisma ORM
+- Auth: Clerk
+- Styling: Tailwind CSS v3
+
+## Naming Conventions
+- Files: kebab-case (e.g., `user-profile.ts`)
+- Components: PascalCase (e.g., `UserProfile.tsx`)
+- Functions: camelCase (e.g., `getUserById`)
+- Database tables: snake_case (e.g., `user_profiles`)
+```
+
 ### `docs/locked-patterns.md`
 The no-touch list. Files, modules, architecture decisions, and dependency versions that must never be changed without explicit human approval. This is where you protect your auth system, payment provider, ORM configuration, CI/CD pipeline, and API permission middleware. The agent reads this first and checks every proposed change against it.
+
+**Example entry:**
+```markdown
+## LOCKED: Authentication System
+- File: `lib/auth.ts`
+- Reason: Clerk integration with custom session claims. Any change risks breaking session validation across all routes.
+- Never touch: JWT secret, session duration, middleware matcher patterns
+- To change: requires human review + staging test + explicit approval
+
+## LOCKED: Payment Provider
+- Provider: Stripe (do NOT suggest switching to another provider)
+- Webhook handler: `app/api/stripe/webhook/route.ts`
+- Locked version: stripe@14.x — never upgrade without explicit approval
+```
 
 ### `docs/knowledge-base.md`
 Institutional memory. Logs confirmed bugs and their fixes, known workarounds, integration quirks, and hard-won lessons. Every time an agent causes a problem that gets fixed, the fix goes here so no future session can repeat the same mistake.
 
+**Example entry:**
+```markdown
+## Bug: Prisma connection pool exhaustion in serverless
+- Date logged: 2024-11-15
+- Symptom: Random 500 errors under load, `PrismaClientKnownRequestError: Can't reach database`
+- Root cause: Each serverless function invocation opened a new Prisma client without closing it
+- Fix: Use singleton pattern with global client cache (see `lib/prisma.ts`)
+- NEVER: instantiate `new PrismaClient()` outside of `lib/prisma.ts`
+```
+
 ### `docs/session-handoff.md`
 The session bridge. Written at the end of every session, read at the start of the next. Captures current state, what was just completed, what is in progress, what is next, and any open questions. Transforms a cold-start session from a 15-minute re-briefing into a 30-second confirmation.
+
+**Example entry:**
+```markdown
+## Current Status — 2026-06-25
+
+### Completed This Session
+- Added SECURITY.md, CODEOWNERS, dependabot.yml, CI workflow
+- Renamed TEMPLATE/ to docs/ for AppShield score compliance
+
+### In Progress
+- Scan history Supabase integration (parked for v2)
+
+### Next Session
+- Add examples for Python/Django and Go stacks
+- Review and merge community PRs
+
+### Open Questions
+- Should locked-patterns.md be split into sub-documents at v2.0?
+```
 
 ### `docs/update-process.md`
 The rules for keeping `/docs` current. Defines which document to update after which type of change, how to handle conflicts, and the Two-Action Rule in detail. The agent follows this automatically after every task.
@@ -134,14 +239,39 @@ The rules for keeping `/docs` current. Defines which document to update after wh
 ### `docs/decision-log.md`
 Architecture Decision Records (ADRs). Logs the context, options considered, decision made, and rationale for every major architectural choice. Prevents agents from questioning and overriding settled decisions because the reasoning is already documented.
 
+**Example entry:**
+```markdown
+## ADR-001: Use Clerk for authentication (not NextAuth)
+- Date: 2024-09-01
+- Context: Need auth for SaaS product with GitHub OAuth + magic links
+- Options considered: NextAuth, Supabase Auth, Clerk
+- Decision: Clerk
+- Rationale: Best-in-class DX for Next.js, hosted user management UI, webhook events for billing sync
+- Consequences: Vendor dependency on Clerk. Acceptable for MVP and beyond.
+- Status: LOCKED — do not revisit without explicit product decision
+```
+
 ### `docs/agent-workflow.md`
 Multi-model guidance. Defines which AI model or mode to use for which type of task — architecture decisions, bug fixes, code generation, review. Prevents using a fast cheap model for decisions that need careful reasoning.
+
+**Example entry:**
+```markdown
+## Model Assignment
+
+| Task Type | Use | Notes |
+|-----------|-----|-------|
+| Architecture decisions | Claude Sonnet / o3 | High-stakes: use best reasoning model |
+| Bug investigation | Claude Sonnet | Needs full context window |
+| Boilerplate generation | GPT-4o / Haiku | Fast, cheap, deterministic |
+| Code review | Claude Sonnet | Check against conventions.md |
+| Documentation updates | Any | Type 2 action — auto-execute |
+```
 
 ---
 
 ## Large Document Protocol
 
-As projects grow, `/docs` files — especially `knowledge-base.md` — will grow large. A document over 600 lines can exceed an agent's practical context window. AI AppShield includes a built-in scaling strategy.
+As projects grow, `/docs` files — especially `knowledge-base.md` — will grow large. A document over 600 lines can exceed an agent’s practical context window. AI AppShield includes a built-in scaling strategy.
 
 ### Size Thresholds
 
@@ -206,6 +336,7 @@ No public framework combines all five. AI AppShield is the first to formalize th
 
 - **Contribute:** See [CONTRIBUTING.md](CONTRIBUTING.md)
 - **Issues & ideas:** [Open an issue](https://github.com/ai-appshield/ai-shield/issues)
+- **Security:** See [SECURITY.md](SECURITY.md)
 - **Built with AI AppShield?** Add it to the [EXAMPLES](EXAMPLES/) folder
 
 ---
